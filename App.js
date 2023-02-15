@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-// import * as SplashScreen from 'expo-splash-screen';
+import * as SplashScreen from 'expo-splash-screen';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-// SplashScreen.preventAutoHideAsync();
-// setTimeout(SplashScreen.hideAsync, 2000);
+SplashScreen.preventAutoHideAsync();
+setTimeout(SplashScreen.hideAsync, 2000);
 
 const art = require("./assets/art.png");
 const mile = require("./assets/mile.png");
