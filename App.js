@@ -17,7 +17,7 @@ import { Button } from "react-native";
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 2000);
 const art = require("./assets/icon.png");
-
+const db = SQLite.openDatabase('recipe.db');
 
 function HomeScreen({ navigation }) {
   return (
@@ -30,7 +30,7 @@ function HomeScreen({ navigation }) {
 function AddScreen({ navigation }) {
   const [name, setName] = useState(null);
   const [url, setUrl] = useState(null);
-  const [forceUpdate, forceUpdateId] = useForceUpdate();
+  // const [forceUpdate, forceUpdateId] = useForceUpdate();
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -62,7 +62,7 @@ function AddScreen({ navigation }) {
 }
 
 function ViewScreen({ navigation }) {
-  const db = SQLite.openDatabase('recipe.db');
+
   const [isLoading, setIsLoading] = useState(true);
 
 
