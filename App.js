@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -11,51 +11,86 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from 'expo-splash-screen';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import * as SQLite from "expo-sqlite";
+import { Button } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 2000);
+const art = require("./assets/icon.png");
 
-const art = require("./assets/art.png");
-const mile = require("./assets/mile.png");
-const pier = require("./assets/pier.png");
-const water = require("./assets/water.png");
-const willis = require("./assets/willis.png");
 
 function HomeScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Image source={art} style={styles.pic}></Image>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center",}}>
+      <Text>Hello World</Text>
     </View>
   );
 }
 
-function MileScreen({ navigation }) {
+function AddScreen({ navigation }) {
+  const [name, setName] = useState(null);
+  const [url, setUrl] = useState(null);
+  const [forceUpdate, forceUpdateId] = useForceUpdate();
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "create table if not exists recipes (id integer primary key not null, dishname text, dishurl text);"
+      );
+    });
+  }, []);
+  const add = (name, url) => {
+    if(name === null || name ==="" || url === null || url ===""){
+      return false;
+    }
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql("insert into recipes (dishname, dishurl) values (? , ?)", [name, url]);
+      }
+    );
+  }
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Image source={mile} style={styles.pic}></Image>
+      <Text>Add Recipe Screen</Text>
+      <TextInput value={name} onChangeText={(newName) => setName(newName)} placeholder="Dish Name"></TextInput>
+      <TextInput value={url} onChangeText={(newUrl) => setUrl(newUrl)} placeholder="Recipe URL" ></TextInput>
+      <Button title="Add Recipe" onPress={add(name, url)}></Button>
+      <Text>{name}{url}</Text>
     </View>
   );
 }
-function PierScreen({ navigation }) {
+
+function ViewScreen({ navigation }) {
+  const db = SQLite.openDatabase('recipe.db');
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  if (isLoading){
+    return(
+      <View>
+        <Text>Content Loading</Text>
+      </View>
+    )
+  }
+  db.transaction(
+    (tx) => {
+      tx.executeSql("select * from items", [], (_, { rows }) =>
+        console.log(JSON.stringify(rows))
+      );
+    },
+    null,
+    forceUpdate
+  );
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Image source={pier} style={styles.pic}></Image>
+      <Text>View Recipes Screen</Text>
     </View>
   );
 }
-function WaterScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Image source={water} style={styles.pic}></Image>
-    </View>
-  );
-}
-function WillisScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Image source={willis} style={styles.pic}></Image>
-    </View>
-  );
+function getRecipes() {
+  const [recipes, setRecipes] = useState([]);
+
 }
 
 
@@ -64,12 +99,10 @@ const Drawer = createDrawerNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <Drawer.Navigator initialRouteName="Art Institute of Chicago">
-        <Drawer.Screen name="Art Institute of Chicago" component={HomeScreen}/>
-        <Drawer.Screen name="Magnificent Mile" component={MileScreen}/>
-        <Drawer.Screen name="Navy Pier" component={PierScreen}/>
-        <Drawer.Screen name="Water Tower" component={WaterScreen}/>
-        <Drawer.Screen name="Willis Tower" component={WillisScreen}/>
+      <Drawer.Navigator initialRouteName="Home" screenOptions={({navigation}) => ({ headerLeft: () => <Pressable onPress={navigation.toggleDrawer}><Image source={art} style={styles.pic}></Image></Pressable>})}>
+        <Drawer.Screen name="Home" component={HomeScreen}/>
+        <Drawer.Screen name="Add Recipe" component={AddScreen}/>
+        <Drawer.Screen name="View Recipe" component={ViewScreen}/>
       </Drawer.Navigator>
     </NavigationContainer>
   );
@@ -77,12 +110,17 @@ function App() {
 
 const styles = StyleSheet.create({
   container:{
+    backgroundColor: 'red',
+    color: 'red',
     marginTop: 130,
   },
   pic:{
-    width: 320,
-    height: 480,
+    width: 40,
+    height: 40,
   },
+  tab:{
+    backgroundColor: 'red',
+  }
 
 });
 export default App;
