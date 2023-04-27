@@ -41,6 +41,7 @@ function AboutScreen({ navigation }) {
 function AddScreen({ navigation }) {
   const [name, setName] = useState(null);
   const [url, setUrl] = useState(null);
+  const [v, setV] = useState(true);
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -61,23 +62,38 @@ function AddScreen({ navigation }) {
       ], (res) => {console.log("add", res)}, (err) => {console.log(err)});
     });
   };
-
+  function isInputValid(){
+    if(name === null || name === "" || url === null || url === ""){
+      return true
+    }
+  }
+  // const AppButton = () => (
+  //   <Pressable>
+  //     <Text>Add Recipe</Text>
+  //   </Pressable>
+  // );
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Add Recipe Screen</Text>
+    <View style={styles.add}>
+      <Text style={styles.hometext1}>New Recipe</Text>
+      <Text style={styles.label}>Name of Dish:</Text>
       <TextInput
         value={name}
         onChangeText={(newName) => setName(newName)}
         placeholder="Dish Name"
         required={true}
+        style={styles.addInput}
       ></TextInput>
+      <Text style={styles.label}>Website URL:</Text>
       <TextInput
         value={url}
         onChangeText={(newUrl) => setUrl(newUrl)}
         placeholder="Recipe URL"
         required={true}
+        style={styles.addInput}
       ></TextInput>
-      <Button title="Add Recipe" onPress={() => add(name, url)}></Button>
+      <Button style={styles.addbtn} title="Add Recipe" disabled={isInputValid()} onPress={() => add(name, url)}></Button>
+      {/* <AppButton style={styles.addbtn} onPress={() => add(name, url)}></AppButton> */}
+
     </View>
   );
 }
@@ -157,6 +173,25 @@ const styles = StyleSheet.create({
   pic: {
     width: 40,
     height: 40,
+  },
+  add:{
+    flex: 1,
+    backgroundColor: '#CD8987',
+  },
+  addInput:{
+    width: '100%',
+    backgroundColor: '#CDACA1',
+    padding: 10,
+    marginBottom: 30,
+  },  
+  addbtn:{
+    backgroundColor:'#19647E',
+    color:'#19647E',
+
+  },
+  label:{
+    color: '#B9DFCD',
+    fontSize: 20,
   },
 });
 export default App;
