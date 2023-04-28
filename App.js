@@ -6,8 +6,10 @@ import {
   TextInput,
   Image,
   Pressable,
+  Linking,
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import * as WebBrowser from 'expo-web-browser';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -19,6 +21,19 @@ import { Fragment } from "react/cjs/react.production.min";
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 2000);
 const art = require("./assets/icon.png");
+
+function openDatabase() {
+  if (Platform.OS === "web") {
+    return {
+      transaction: () => {
+        return {
+          executeSql: () => {},
+        };
+      },
+    };
+  }
+}
+
 const db = SQLite.openDatabase("recipe.db");
 
 function HomeScreen({ navigation }) {
@@ -61,6 +76,12 @@ function AddScreen({ navigation }) {
         url,
       ], (res) => {console.log("add", res)}, (err) => {console.log(err)});
     });
+
+    setName('');
+    setUrl('');
+    
+    navigation.navigate('View Recipe');
+
   };
   function isInputValid(){
     if(name === null || name === "" || url === null || url === ""){
@@ -74,6 +95,7 @@ function AddScreen({ navigation }) {
   // );
   return (
     <View style={styles.add}>
+      <View style={styles.margin}>
       <Text style={styles.hometext1}>New Recipe</Text>
       <Text style={styles.label}>Name of Dish:</Text>
       <TextInput
@@ -92,8 +114,9 @@ function AddScreen({ navigation }) {
         style={styles.addInput}
       ></TextInput>
       <Button style={styles.addbtn} title="Add Recipe" disabled={isInputValid()} onPress={() => add(name, url)}></Button>
+      </View>
       {/* <AppButton style={styles.addbtn} onPress={() => add(name, url)}></AppButton> */}
-
+      <Text style={styles.infolabel}>*Website URL must include http://</Text>
     </View>
   );
 }
@@ -109,20 +132,35 @@ function ViewScreen({ navigation }) {
     }, null);
   });
 
+  function openRecipe(url){
+    try{
+    WebBrowser.openBrowserAsync(url);
+    }catch(e){
+      console.log(e);
+    }
+  }
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <ScrollView>
+    <View style={styles.add}>
+      <Text style={styles.hometext1}>Find Your Dish</Text>
+      <ScrollView style={styles.margin}>
         {recipes.length > 0 &&
           recipes.map((recipe) => (
-            <Fragment key={recipe.id}>
-              <Text>
+            <View style={styles.recipe} key={recipe.id}>
+            <Fragment key={recipe.id} >
+              <View>
+              <Text onPress={() => openRecipe(recipe.dishurl)} style={styles.recipetext}>
                 {recipe.dishname}
               </Text>
-              <Text>
+              {/* <Text onPress={() => openRecipe(recipe.dishurl)} style={styles.recipetexturl}>
                 {recipe.dishurl}
-              </Text>
-              <Button title="Delete" onPress={() => db.transaction((tx)=>{tx.executeSql(`delete from recipes where id = ?;`, [recipe.id]); }, null,)}></Button>
+              </Text> */}
+              </View>
+              <View style={styles.delbtn}>
+              <Button style={styles.delbtn} title="Delete" onPress={() => db.transaction((tx)=>{tx.executeSql(`delete from recipes where id = ?;`, [recipe.id]); }, null,)}></Button>
+              </View>
             </Fragment>
+            </View>
           ))}
       </ScrollView>
     </View>
@@ -167,7 +205,6 @@ const styles = StyleSheet.create({
   },
   hometext2:{
     textAlign: 'center',
-    fontFamily: 'Serif',
     color:'#37392E',
   },
   pic: {
@@ -187,11 +224,45 @@ const styles = StyleSheet.create({
   addbtn:{
     backgroundColor:'#19647E',
     color:'#19647E',
-
+  },
+  delbtn:{
+    display: 'flex',
+    margin: 0,
+    padding: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
+  recipe:{
+    backgroundColor: '#37392E',
+    marginBottom: 20,
+    height: 70,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+  },
+  recipetext:{
+    color: '#CDACA1',
+    fontSize: 25,
+    paddingLeft: 20,
+    paddingRight: 60,
+    marginRight: 100,
+  },
+  recipetexturl:{
+    color: '#CDACA1',
+    fontSize: 15,
+    paddingLeft: 20,
+    paddingRight: 60,
+    maxWidth: 300,
   },
   label:{
     color: '#B9DFCD',
     fontSize: 20,
+  },
+  infolabel:{
+    display: 'flex',
+    color: '#B9DFCD',
+  },
+  margin:{
+    marginTop: 100,
   },
 });
 export default App;
