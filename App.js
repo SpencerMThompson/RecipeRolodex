@@ -6,7 +6,7 @@ import {
   TextInput,
   Image,
   Pressable,
-  Linking,
+  Button, 
 } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import * as WebBrowser from 'expo-web-browser';
@@ -14,8 +14,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import * as SQLite from "expo-sqlite";
-import { Button } from "react-native";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import * as Font from 'expo-font';
+import { ScrollView } from "react-native-gesture-handler";
 import { Fragment } from "react/cjs/react.production.min";
 
 SplashScreen.preventAutoHideAsync();
@@ -47,8 +47,10 @@ function HomeScreen({ navigation }) {
 
 function AboutScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+    <View style={styles.about}>
+      <ScrollView style={styles.margin2}>
+      <Text style={styles.hometext1}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text>
+      </ScrollView>
     </View>
   );
 }
@@ -117,6 +119,8 @@ function AddScreen({ navigation }) {
       </View>
       {/* <AppButton style={styles.addbtn} onPress={() => add(name, url)}></AppButton> */}
       <Text style={styles.infolabel}>*Website URL must include http://</Text>
+      <Text style={styles.infolabel}>*Please copy and paste URL</Text>
+
     </View>
   );
 }
@@ -143,6 +147,7 @@ function ViewScreen({ navigation }) {
   return (
     <View style={styles.add}>
       <Text style={styles.hometext1}>Find Your Dish</Text>
+      <Text style={styles.infolabel}>Click a Recipe</Text>
       <ScrollView style={styles.margin}>
         {recipes.length > 0 &&
           recipes.map((recipe) => (
@@ -183,7 +188,7 @@ function App() {
         })
       }
       >
-        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="Recipe Rolodex" component={HomeScreen} />
         <Drawer.Screen name="Add Recipe" component={AddScreen} />
         <Drawer.Screen name="View Recipe" component={ViewScreen} />
         <Drawer.Screen name="About" component={AboutScreen}/>
@@ -199,6 +204,7 @@ const styles = StyleSheet.create({
     paddingTop: '50%',
   },
   hometext1:{
+    fontFamily: '',
     textAlign: 'center',
     fontSize: 30,
     color:'#37392E',
@@ -206,6 +212,10 @@ const styles = StyleSheet.create({
   hometext2:{
     textAlign: 'center',
     color:'#37392E',
+  },
+  about:{
+    flex: 1,
+    backgroundColor: '#CD8987',
   },
   pic: {
     width: 40,
@@ -260,9 +270,13 @@ const styles = StyleSheet.create({
   infolabel:{
     display: 'flex',
     color: '#B9DFCD',
+    textAlign:'center',
   },
   margin:{
     marginTop: 100,
+  },
+  margin2:{
+    marginTop: 10,
   },
 });
 export default App;
