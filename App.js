@@ -18,6 +18,12 @@ import * as Font from 'expo-font';
 import { ScrollView } from "react-native-gesture-handler";
 import { Fragment } from "react/cjs/react.production.min";
 
+
+/*
+The app has core functionality, but I overestimated how much I would be able to get done. 
+Going forward I play to implement all the functions described in my project outline and wireframe
+*/
+
 SplashScreen.preventAutoHideAsync();
 setTimeout(SplashScreen.hideAsync, 2000);
 const art = require("./assets/icon.png");
